@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classificar Informação · Sistema de Classificação</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page-narrow">
+
+    <a href="index.html" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Voltar ao Dashboard
+    </a>
+
+    <div class="form-card">
+      <!-- Header -->
+      <div class="section-header">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Classificar Informação</h2>
+        </div>
+      </div>
+      <p style="color:var(--text-secondary);font-size:0.9rem;margin-left:56px;margin-bottom:28px;">
+        Classifique segundo a CIA Triad
+      </p>
+
+      <!-- CIA Triad Box -->
+      <div class="cia-box">
+        <h3>CIA Triad - Tríade de Segurança</h3>
+        <div class="cia-line">
+          <span class="c">Confidencialidade:</span>  Proteção contra acesso não autorizado
+        </div>
+        <div class="cia-line">
+          <span class="i">Integridade:</span>  Proteção contra modificações não autorizadas
+        </div>
+        <div class="cia-line">
+          <span class="a">Disponibilidade:</span>  Garantia de acesso quando necessário
+        </div>
+      </div>
+
+      <!-- Select Information -->
+      <div class="form-group">
+        <label for="info">Selecione a Informação</label>
+        <select id="info">
+          <option value="" disabled selected>Selecione uma informação...</option>
+          <option>Dados de Clientes 2026</option>
+          <option>Relatórios Financeiros Q1</option>
+          <option>Documentação Técnica</option>
+          <option>Registros de Funcionários</option>
+          <option>Dados Públicos</option>
+        </select>
+      </div>
+
+      <!-- Confidencialidade -->
+      <div class="classify-section">
+        <h3 class="c">Confidencialidade</h3>
+        <p>Qual o nível de sigilo necessário para esta informação?</p>
+        <div class="form-group">
+          <select id="confidencialidade">
+            <option value="" disabled selected>Selecione o nível...</option>
+            <option value="publico">Público — Sem restrição de acesso</option>
+            <option value="interno">Interno — Somente colaboradores</option>
+            <option value="confidencial">Confidencial — Acesso restrito</option>
+            <option value="secreto">Secreto — Altamente restrito</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Integridade -->
+      <div class="classify-section">
+        <h3 class="i">Integridade</h3>
+        <p>Qual o impacto se a informação for alterada indevidamente?</p>
+        <div class="form-group">
+          <select id="integridade">
+            <option value="" disabled selected>Selecione o nível...</option>
+            <option value="baixo">Baixo — Impacto mínimo</option>
+            <option value="medio">Médio — Impacto moderado</option>
+            <option value="alto">Alto — Impacto significativo</option>
+            <option value="critico">Crítico — Impacto severo</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Disponibilidade -->
+      <div class="classify-section">
+        <h3 class="a">Disponibilidade</h3>
+        <p>Qual o impacto se a informação ficar indisponível?</p>
+        <div class="form-group">
+          <select id="disponibilidade">
+            <option value="" disabled selected>Selecione o nível...</option>
+            <option value="baixo">Baixo — Pode ficar indisponível</option>
+            <option value="medio">Médio — Indisponibilidade tolerável</option>
+            <option value="alto">Alto — Deve estar sempre disponível</option>
+            <option value="critico">Crítico — Disponibilidade contínua obrigatória</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="salvarClassificacao()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        Salvar Classificação
+      </button>
+    </div>
+
+  </main>
+
+  <script>
+    function salvarClassificacao() {
+      const info = document.getElementById('info').value;
+      const c = document.getElementById('confidencialidade').value;
+      const i = document.getElementById('integridade').value;
+      const a = document.getElementById('disponibilidade').value;
+      if (!info || !c || !i || !a) {
+        alert('Por favor, preencha todos os campos antes de salvar.');
+        return;
+      }
+      alert('Classificação salva com sucesso!');
+    }
+  </script>
+</body>
+</html>
