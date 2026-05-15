@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliar Valor e Impacto</title>
+    <link rel="stylesheet" href="style-avaliar.css">
+</head>
+<body>
+
+    <div class="page-container">
+        <!-- Link de Voltar -->
+        <a href="index.html" class="back-link">
+            <span class="arrow">&larr;</span> Voltar ao Dashboard
+        </a>
+
+        <!-- Cabeçalho Principal -->
+        <header class="main-header">
+            <div class="header-title-container">
+                <span class="icon-trend">&nearr;</span>
+                <h1>Avaliar Valor e Impacto</h1>
+            </div>
+            <p class="subtitle">Determine o valor e impacto da informação</p>
+        </header>
+
+        <!-- Formulário -->
+        <form class="evaluation-form">
+            
+            <!-- Campo: Selecione a Informação -->
+            <div class="form-group main-select">
+                <label for="informacao">Selecione a Informação</label>
+                <div class="select-wrapper">
+                    <select id="informacao" name="informacao" required>
+                        <option value="" disabled selected>Selecione uma informação...</option>
+                        <!-- Adicione suas opções dinâmicas aqui -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Bloco: Valor Financeiro -->
+            <div class="card-group green-border">
+                <label class="card-label label-financeiro">$ Valor Financeiro</label>
+                <p class="card-question">Qual o valor monetário direto desta informação?</p>
+                <div class="select-wrapper">
+                    <select name="valor_financeiro" required>
+                        <option value="" disabled selected>Selecione...</option>
+                        <option value="1">Baixo - Até R$ 10.000</option>
+                        <option value="2">Médio - R$ 10.000 a R$ 100.000</option>
+                        <option value="3">Alto - R$ 100.000 a R$ 1.000.000</option>
+                        <option value="4">Crítico - Acima de R$ 1.000.000</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Bloco: Impacto Operacional -->
+            <div class="card-group green-border">
+                <label class="card-label label-operacional">Impacto Operacional</label>
+                <p class="card-question">Qual o impacto nas operações se a informação for comprometida?</p>
+                <div class="select-wrapper">
+                    <select name="impacto_operacional" required>
+                        <option value="" disabled selected>Selecione...</option>
+                        <option value="1">Baixo - impacto mínimo nas operações</option>
+                        <option value="2">Médio - interrupção parcial de processos</option>
+                        <option value="3">Alto - interrupção significativa</option>
+                        <option value="4">Crítico - paralização total das operações</option>
+                    </select>
+
+                </div>
+            </div>
+
+            <!-- Bloco: Impacto Reputacional -->
+            <div class="card-group green-border">
+                <label class="card-label label-reputacional">Impacto Reputacional</label>
+                <p class="card-question">Qual o impacto na reputação da organização?</p>
+                <div class="select-wrapper">
+                    <select name="impacto_reputacional">
+                        <option value="" disabled selected>Selecione...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Bloco: Impacto Regulatório/Legal -->
+            <div class="card-group red-border">
+                <label class="card-label label-regulatorio">Impacto Regulatório/Legal</label>
+                <p class="card-question">Qual o risco de não conformidade com leis e regulamentações (LGPD, etc)?</p>
+                <div class="select-wrapper">
+                    <select name="impacto_legal">
+                        <option value="" disabled selected>Selecione...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Bloco: Custo de Recuperação -->
+            <div class="card-group green-border">
+                <label class="card-label label-recuperacao">Custo de Recuperação</label>
+                <p class="card-question">Qual o custo estimado para recuperar a informação se perdida?</p>
+                <div class="select-wrapper">
+                    <select name="custo_recuperacao">
+                        <option value="" disabled selected>Selecione...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botão de Ação -->
+            <button type="submit" class="btn-calculate">
+                <span class="btn-icon">&nearr;</span> Calcular Valor e Risco
+            </button>
+
+        </form>
+    </div>
+
+</body>
+</html>
