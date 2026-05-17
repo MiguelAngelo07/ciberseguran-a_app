@@ -17,8 +17,8 @@
       Voltar ao Dashboard
     </a>
 
+    <!-- FORM -->
     <div class="form-card">
-      <!-- Header -->
       <div class="section-header">
         <div class="icon-wrap">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -32,13 +32,12 @@
           <h2>Cadastrar Informação</h2>
         </div>
       </div>
-      <p style="color:var(--text-secondary);font-size:0.9rem;margin-left:56px;margin-bottom:28px;">
+      <p style="color:var(--text-secondary);font-size:.9rem;margin-left:56px;margin-bottom:28px;">
         Adicione uma nova informação ao sistema
       </p>
 
-      <!-- Form -->
       <div class="form-group">
-        <label for="nome">Nome da Informação</label>
+        <label for="nome">Nome da Informação <span style="color:var(--red)">*</span></label>
         <input type="text" id="nome" placeholder="Ex: Dados de clientes 2026" />
       </div>
 
@@ -51,21 +50,21 @@
         <div class="form-group">
           <label for="tipo">Tipo de Informação</label>
           <select id="tipo">
-            <option value="" disabled selected>Selecione...</option>
-            <option>Dado Pessoal</option>
-            <option>Dado Financeiro</option>
-            <option>Dado Técnico</option>
-            <option>Dado Operacional</option>
-            <option>Dado Público</option>
+            <option value="">Selecione...</option>
+            <option value="pessoal">Dado Pessoal</option>
+            <option value="financeiro">Dado Financeiro</option>
+            <option value="tecnico">Dado Técnico</option>
+            <option value="operacional">Dado Operacional</option>
+            <option value="publico">Dado Público</option>
           </select>
         </div>
         <div class="form-group">
           <label for="formato">Formato</label>
           <select id="formato">
-            <option value="" disabled selected>Selecione...</option>
-            <option>Digital</option>
-            <option>Físico</option>
-            <option>Híbrido</option>
+            <option value="">Selecione...</option>
+            <option value="digital">Digital</option>
+            <option value="fisico">Físico</option>
+            <option value="hibrido">Híbrido</option>
           </select>
         </div>
       </div>
@@ -81,7 +80,7 @@
         </div>
       </div>
 
-      <button class="btn-primary" onclick="cadastrar()">
+      <button class="btn-primary" id="btn-cadastrar">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <ellipse cx="12" cy="5" rx="9" ry="3"/>
@@ -92,17 +91,135 @@
       </button>
     </div>
 
+    <!-- LISTA DE INFORMAÇÕES -->
+    <div class="info-list-section">
+      <h3 id="lista-titulo">Informações Cadastradas</h3>
+      <div id="lista-container"></div>
+    </div>
+
   </main>
 
+  <script src="app.js"></script>
   <script>
-    function cadastrar() {
-      const nome = document.getElementById('nome').value.trim();
-      if (!nome) {
-        alert('Por favor, informe o nome da informação.');
+    function renderLista() {
+      const infos = SC.DB.getAll();
+      const cont  = document.getElementById('lista-container');
+      const titulo = document.getElementById('lista-titulo');
+      titulo.textContent = `Informações Cadastradas (${infos.length})`;
+
+      if (!infos.length) {
+        cont.innerHTML = `
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+            </svg>
+            Nenhuma informação cadastrada ainda.
+          </div>`;
         return;
       }
-      alert('Informação "' + nome + '" cadastrada com sucesso!');
+
+      const TIPO_LABELS = {
+        pessoal:'Pessoal', financeiro:'Financeiro', tecnico:'Técnico',
+        operacional:'Operacional', publico:'Público'
+      };
+      const FORMATO_LABELS = { digital:'Digital', fisico:'Físico', hibrido:'Híbrido' };
+
+      cont.innerHTML = `
+        <div class="info-table-wrap">
+          <table class="info-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Formato</th>
+                <th>Proprietário</th>
+                <th>Classificação</th>
+                <th>Score</th>
+                <th>Cadastro</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${infos.map(info => {
+                const score = SC.calcularScore(info);
+                const nivel = SC.nivelRisco(score);
+                const temCia = !!info.classificacao?.confidencialidade;
+                const scoreText = score !== null ? score : '—';
+                const badgeClass = score === null ? 'badge-gray'
+                  : score >= 70 ? 'badge-red'
+                  : score >= 40 ? 'badge-yellow'
+                  : 'badge-green';
+
+                return `<tr>
+                  <td class="col-nome">${info.nome}</td>
+                  <td>${TIPO_LABELS[info.tipo] || '—'}</td>
+                  <td>${FORMATO_LABELS[info.formato] || '—'}</td>
+                  <td>${info.proprietario || '—'}</td>
+                  <td>
+                    ${temCia
+                      ? `<span class="badge badge-green">Classificada</span>`
+                      : `<span class="badge badge-gray">Pendente</span>`}
+                  </td>
+                  <td>
+                    <span class="badge ${badgeClass}">${scoreText}${score !== null ? '/100' : ''}</span>
+                  </td>
+                  <td style="white-space:nowrap">${SC.formatDate(info.dataCadastro)}</td>
+                  <td>
+                    <button class="btn-danger" onclick="excluir('${info.id}')">Excluir</button>
+                  </td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>`;
     }
+
+    function excluir(id) {
+      const info = SC.DB.getById(id);
+      if (!info) return;
+      if (!confirm(`Excluir "${info.nome}"? Esta ação não pode ser desfeita.`)) return;
+      SC.DB.delete(id);
+      SC.toast(`"${info.nome}" excluída.`, 'info');
+      renderLista();
+    }
+
+    document.getElementById('btn-cadastrar').addEventListener('click', () => {
+      const nome = document.getElementById('nome').value.trim();
+      if (!nome) {
+        SC.toast('Informe o nome da informação.', 'error');
+        document.getElementById('nome').focus();
+        return;
+      }
+
+      const info = {
+        id:           SC.gerarId(),
+        nome,
+        descricao:    document.getElementById('descricao').value.trim(),
+        tipo:         document.getElementById('tipo').value,
+        formato:      document.getElementById('formato').value,
+        proprietario: document.getElementById('proprietario').value.trim(),
+        localizacao:  document.getElementById('localizacao').value.trim(),
+        dataCadastro: new Date().toISOString(),
+        classificacao: null,
+        avaliacao:     null
+      };
+
+      SC.DB.save(info);
+      SC.toast(`"${nome}" cadastrada com sucesso!`, 'success');
+
+      // Reset form
+      ['nome','descricao','proprietario','localizacao'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('tipo').value = '';
+      document.getElementById('formato').value = '';
+
+      renderLista();
+    });
+
+    // Render on load
+    renderLista();
   </script>
 </body>
 </html>

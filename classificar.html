@@ -8,7 +8,7 @@
 </head>
 <body>
   <main class="page-narrow">
-
+ 
     <a href="index.html" class="back-link">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -16,9 +16,8 @@
       </svg>
       Voltar ao Dashboard
     </a>
-
+ 
     <div class="form-card">
-      <!-- Header -->
       <div class="section-header">
         <div class="icon-wrap">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -26,41 +25,34 @@
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
         </div>
-        <div>
-          <h2>Classificar Informação</h2>
-        </div>
+        <div><h2>Classificar Informação</h2></div>
       </div>
-      <p style="color:var(--text-secondary);font-size:0.9rem;margin-left:56px;margin-bottom:28px;">
+      <p style="color:var(--text-secondary);font-size:.9rem;margin-left:56px;margin-bottom:28px;">
         Classifique segundo a CIA Triad
       </p>
-
+ 
       <!-- CIA Triad Box -->
       <div class="cia-box">
         <h3>CIA Triad - Tríade de Segurança</h3>
-        <div class="cia-line">
-          <span class="c">Confidencialidade:</span>  Proteção contra acesso não autorizado
-        </div>
-        <div class="cia-line">
-          <span class="i">Integridade:</span>  Proteção contra modificações não autorizadas
-        </div>
-        <div class="cia-line">
-          <span class="a">Disponibilidade:</span>  Garantia de acesso quando necessário
-        </div>
+        <div class="cia-line"><span class="c">Confidencialidade:</span>  Proteção contra acesso não autorizado</div>
+        <div class="cia-line"><span class="i">Integridade:</span>  Proteção contra modificações não autorizadas</div>
+        <div class="cia-line"><span class="a">Disponibilidade:</span>  Garantia de acesso quando necessário</div>
       </div>
-
-      <!-- Select Information -->
+ 
+      <!-- Score atual (exibido após salvar ou ao selecionar informação já classificada) -->
+      <div id="score-atual" style="display:none"></div>
+ 
+      <!-- Select Informação -->
       <div class="form-group">
-        <label for="info">Selecione a Informação</label>
-        <select id="info">
+        <label for="info-sel">Selecione a Informação</label>
+        <select id="info-sel">
           <option value="" disabled selected>Selecione uma informação...</option>
-          <option>Dados de Clientes 2026</option>
-          <option>Relatórios Financeiros Q1</option>
-          <option>Documentação Técnica</option>
-          <option>Registros de Funcionários</option>
-          <option>Dados Públicos</option>
         </select>
+        <div id="sem-infos" style="display:none;margin-top:10px;font-size:.85rem;color:var(--text-muted)">
+          Nenhuma informação cadastrada. <a href="cadastrar.html" style="color:var(--green)">Cadastre uma primeiro →</a>
+        </div>
       </div>
-
+ 
       <!-- Confidencialidade -->
       <div class="classify-section">
         <h3 class="c">Confidencialidade</h3>
@@ -75,7 +67,7 @@
           </select>
         </div>
       </div>
-
+ 
       <!-- Integridade -->
       <div class="classify-section">
         <h3 class="i">Integridade</h3>
@@ -90,7 +82,7 @@
           </select>
         </div>
       </div>
-
+ 
       <!-- Disponibilidade -->
       <div class="classify-section">
         <h3 class="a">Disponibilidade</h3>
@@ -105,8 +97,8 @@
           </select>
         </div>
       </div>
-
-      <button class="btn-primary" onclick="salvarClassificacao()">
+ 
+      <button class="btn-primary" id="btn-salvar">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
@@ -115,21 +107,90 @@
         Salvar Classificação
       </button>
     </div>
-
+ 
   </main>
-
+ 
+  <script src="app.js"></script>
   <script>
-    function salvarClassificacao() {
-      const info = document.getElementById('info').value;
-      const c = document.getElementById('confidencialidade').value;
-      const i = document.getElementById('integridade').value;
-      const a = document.getElementById('disponibilidade').value;
-      if (!info || !c || !i || !a) {
-        alert('Por favor, preencha todos os campos antes de salvar.');
+    const selInfo  = document.getElementById('info-sel');
+    const selConf  = document.getElementById('confidencialidade');
+    const selInteg = document.getElementById('integridade');
+    const selDisp  = document.getElementById('disponibilidade');
+    const scoreDiv = document.getElementById('score-atual');
+ 
+    function init() {
+      const infos = SC.DB.getAll();
+      if (!infos.length) {
+        selInfo.disabled = true;
+        document.getElementById('sem-infos').style.display = 'block';
+        document.getElementById('btn-salvar').disabled = true;
         return;
       }
-      alert('Classificação salva com sucesso!');
+      SC.popularSelectInfos(selInfo);
     }
+ 
+    function mostrarScore(info) {
+      const score = SC.calcularScore(info);
+      if (score === null) { scoreDiv.style.display = 'none'; return; }
+      const nivel = SC.nivelRisco(score);
+      scoreDiv.style.display = 'flex';
+      scoreDiv.className = 'score-result';
+      scoreDiv.style.borderColor = nivel.color;
+      scoreDiv.style.background  = nivel.bg;
+      scoreDiv.style.color       = nivel.color;
+      scoreDiv.innerHTML = `
+        <div class="score-num">${score}</div>
+        <div class="score-info">
+          <h4>Score de Risco CIA</h4>
+          <p>${nivel.label} — baseado na classificação</p>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-bg">
+            <div class="score-bar-fill" style="width:${score}%;background:${nivel.color}"></div>
+          </div>
+        </div>`;
+    }
+ 
+    function setSelects(classificacao) {
+      if (!classificacao) {
+        selConf.value  = '';
+        selInteg.value = '';
+        selDisp.value  = '';
+        return;
+      }
+      selConf.value  = classificacao.confidencialidade || '';
+      selInteg.value = classificacao.integridade       || '';
+      selDisp.value  = classificacao.disponibilidade   || '';
+    }
+ 
+    selInfo.addEventListener('change', () => {
+      const info = SC.DB.getById(selInfo.value);
+      if (!info) return;
+      setSelects(info.classificacao);
+      mostrarScore(info);
+    });
+ 
+    document.getElementById('btn-salvar').addEventListener('click', () => {
+      if (!selInfo.value) { SC.toast('Selecione uma informação.', 'error'); return; }
+      if (!selConf.value || !selInteg.value || !selDisp.value) {
+        SC.toast('Preencha todos os campos da CIA Triad.', 'error'); return;
+      }
+ 
+      const info = SC.DB.getById(selInfo.value);
+      info.classificacao = {
+        confidencialidade: selConf.value,
+        integridade:       selInteg.value,
+        disponibilidade:   selDisp.value,
+        dataClassificacao: new Date().toISOString()
+      };
+      SC.DB.save(info);
+ 
+      mostrarScore(info);
+      const score = SC.calcularScore(info);
+      SC.toast(`Classificação de "${info.nome}" salva! Score CIA: ${score}/100`, 'success');
+    });
+ 
+    init();
   </script>
 </body>
 </html>
