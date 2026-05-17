@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatórios e Análises · Sistema de Classificação</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    /* ── extras específicos desta página ── */
+    .back-link { margin-bottom: 20px; }
+
+    /* Cabeçalho da página */
+    .rel-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .rel-header svg { width: 34px; height: 34px; color: var(--green); flex-shrink: 0; margin-top: 4px; }
+    .rel-header h1 { font-size: 2rem; font-weight: 700; line-height: 1.1; }
+    .rel-header p  { color: var(--text-secondary); font-size: 0.88rem; margin-top: 3px; }
+
+    /* Stats row */
+    .rs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .rs-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .rs-card .rs-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .rs-card .rs-top span {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    .rs-card .rs-top svg { width: 18px; height: 18px; }
+    .rs-card .rs-top svg.green   { color: var(--green); }
+    .rs-card .rs-top svg.orange  { color: var(--orange); }
+    .rs-card .rs-top svg.red     { color: var(--red); }
+    .rs-card .rs-top svg.lime    { color: #84cc16; }
+
+    .rs-card .rs-number {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+    .rs-card .rs-sub { font-size: 0.78rem; }
+    .rs-card .rs-sub.green  { color: var(--green); }
+    .rs-card .rs-sub.red    { color: var(--red); }
+    .rs-card .rs-sub.orange { color: var(--orange); }
+
+    /* 2-col chart row */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .chart-card, .chart-full {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .chart-full { margin-bottom: 16px; }
+    .chart-card h3, .chart-full h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    /* Pie legend */
+    .pie-wrap {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .pie-wrap canvas { max-width: 200px !important; max-height: 200px !important; }
+    .pie-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.82rem;
+    }
+    .pie-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+    }
+    .pie-legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Bar horizontal chart */
+    .hbar-chart { padding: 4px 0; }
+    .hbar-row {
+      display: grid;
+      grid-template-columns: 130px 1fr 36px;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .hbar-row:last-child { margin-bottom: 0; }
+    .hbar-label {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+    .hbar-track {
+      background: #1e1e1e;
+      border-radius: 4px;
+      height: 26px;
+      overflow: hidden;
+      position: relative;
+    }
+    .hbar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.8s cubic-bezier(.4,0,.2,1);
+    }
+    .hbar-value {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .hbar-axis {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .hbar-axis-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      padding: 0 2px;
+    }
+
+    /* Recommendations */
+    .recommendations {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .recommendations h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .rec-item {
+      border-radius: var(--radius-sm);
+      padding: 15px 18px;
+      margin-bottom: 12px;
+      border: 1px solid;
+    }
+    .rec-item:last-child { margin-bottom: 0; }
+    .rec-item.danger  { background: #200a0a; border-color: #5a1a1a; }
+    .rec-item.warning { background: #1e1800; border-color: #5a4a00; }
+    .rec-item.info    { background: #0a1f0e; border-color: #1a4d28; }
+
+    .rec-item .rec-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .rec-item .rec-title svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .rec-item.danger  .rec-title { color: var(--red); }
+    .rec-item.warning .rec-title { color: var(--yellow); }
+    .rec-item.info    .rec-title { color: var(--green); }
+    .rec-item .rec-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 820px) {
+      .rs-grid     { grid-template-columns: 1fr 1fr; }
+      .charts-row  { grid-template-columns: 1fr; }
+      .pie-wrap    { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 480px) {
+      .rs-grid { grid-template-columns: 1fr; }
+      .hbar-row { grid-template-columns: 90px 1fr 30px; }
+      .hbar-axis { grid-template-columns: 90px 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+
+    <!-- BACK -->
+    <a href="index.html" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Voltar ao Dashboard
+    </a>
+
+    <!-- HEADER -->
+    <div class="rel-header">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/>
+        <line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6"  y1="20" x2="6"  y2="14"/>
+      </svg>
+      <div>
+        <h1>Relatórios e Análises</h1>
+        <p>Visualize métricas e insights de segurança</p>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="rs-grid">
+
+      <div class="rs-card">
+        <div class="rs-top">
+          <span>Total de Informações</span>
+          <svg class="green" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="rs-number">24</div>
+        <div class="rs-sub green">+3 este mês</div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rs-top">
+          <span>Risco Médio</span>
+          <svg class="orange" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+        </div>
+        <div class="rs-number">59%</div>
+        <div class="rs-sub red">Atenção necessária</div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rs-top">
+          <span>Informações Críticas</span>
+          <svg class="red" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="rs-number">5</div>
+        <div class="rs-sub red">Prioridade alta</div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rs-top">
+          <span>Conformidade</span>
+          <svg class="lime" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6"  y1="20" x2="6"  y2="14"/>
+          </svg>
+        </div>
+        <div class="rs-number">92%</div>
+        <div class="rs-sub green">Em conformidade</div>
+      </div>
+
+    </div><!-- /rs-grid -->
+
+    <!-- CHARTS ROW: Pie + Bar -->
+    <div class="charts-row">
+
+      <!-- Pie chart -->
+      <div class="chart-card">
+        <h3>Classificação de Confidencialidade</h3>
+        <div class="pie-wrap">
+          <canvas id="pieChart" width="200" height="200"></canvas>
+          <div class="pie-legend">
+            <div class="pie-legend-item">
+              <div class="pie-legend-dot" style="background:#4ade80;"></div>
+              Público: 33%
+            </div>
+            <div class="pie-legend-item">
+              <div class="pie-legend-dot" style="background:#16a34a;"></div>
+              Interno: 25%
+            </div>
+            <div class="pie-legend-item">
+              <div class="pie-legend-dot" style="background:#14532d;"></div>
+              Confidencial: 29%
+            </div>
+            <div class="pie-legend-item">
+              <div class="pie-legend-dot" style="background:#052e16;"></div>
+              Secreto: 13%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bar chart (vertical) -->
+      <div class="chart-card">
+        <h3>Níveis de Integridade</h3>
+        <canvas id="barChart" height="200"></canvas>
+      </div>
+
+    </div><!-- /charts-row -->
+
+    <!-- HORIZONTAL BAR CHART -->
+    <div class="chart-full">
+      <h3>Score de Risco por Informação</h3>
+      <div class="hbar-chart">
+
+        <div class="hbar-row">
+          <div class="hbar-label">Dados Clientes</div>
+          <div class="hbar-track">
+            <div class="hbar-fill" style="width:92%;background:#ef4444;"></div>
+          </div>
+          <div class="hbar-value">92</div>
+        </div>
+
+        <div class="hbar-row">
+          <div class="hbar-label">Rel. Financeiros</div>
+          <div class="hbar-track">
+            <div class="hbar-fill" style="width:74%;background:#f97316;"></div>
+          </div>
+          <div class="hbar-value">74</div>
+        </div>
+
+        <div class="hbar-row">
+          <div class="hbar-label">Doc. Técnica</div>
+          <div class="hbar-track">
+            <div class="hbar-fill" style="width:48%;background:#eab308;"></div>
+          </div>
+          <div class="hbar-value">48</div>
+        </div>
+
+        <div class="hbar-row">
+          <div class="hbar-label">Reg. Funcionários</div>
+          <div class="hbar-track">
+            <div class="hbar-fill" style="width:68%;background:#f97316;"></div>
+          </div>
+          <div class="hbar-value">68</div>
+        </div>
+
+        <div class="hbar-row">
+          <div class="hbar-label">Dados Públicos</div>
+          <div class="hbar-track">
+            <div class="hbar-fill" style="width:24%;background:#4ade80;"></div>
+          </div>
+          <div class="hbar-value">24</div>
+        </div>
+
+        <!-- axis -->
+        <div class="hbar-axis">
+          <div></div>
+          <div class="hbar-axis-ticks">
+            <span>0</span>
+            <span>25</span>
+            <span>50</span>
+            <span>75</span>
+            <span>100</span>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /chart-full -->
+
+    <!-- RECOMMENDATIONS -->
+    <div class="recommendations">
+      <h3>Recomendações</h3>
+
+      <div class="rec-item danger">
+        <div class="rec-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Ação Urgente
+        </div>
+        <div class="rec-desc">5 informações com score de risco acima de 70% requerem atenção imediata</div>
+      </div>
+
+      <div class="rec-item warning">
+        <div class="rec-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+          Revisar Classificações
+        </div>
+        <div class="rec-desc">8 informações não foram reclassificadas nos últimos 6 meses</div>
+      </div>
+
+      <div class="rec-item info">
+        <div class="rec-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6"  y1="20" x2="6"  y2="14"/>
+          </svg>
+          Implementar Controles
+        </div>
+        <div class="rec-desc">Considere implementar controles adicionais para informações classificadas como "Secreto"</div>
+      </div>
+
+    </div><!-- /recommendations -->
+
+  </main>
+
+  <script>
+    /* ── Pie Chart ── */
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+      type: 'pie',
+      data: {
+        labels: ['Público', 'Interno', 'Confidencial', 'Secreto'],
+        datasets: [{
+          data: [33, 25, 29, 13],
+          backgroundColor: ['#4ade80', '#16a34a', '#14532d', '#052e16'],
+          borderColor: '#161616',
+          borderWidth: 2,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.label}: ${ctx.parsed}%`
+            }
+          }
+        }
+      }
+    });
+
+    /* ── Vertical Bar Chart ── */
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Baixo', 'Médio', 'Alto', 'Crítico'],
+        datasets: [{
+          data: [5, 8, 7, 4],
+          backgroundColor: '#16a34a',
+          borderRadius: 4,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            grid: { color: '#222', drawBorder: false },
+            ticks: { color: '#a3a3a3', font: { family: 'DM Sans' } }
+          },
+          y: {
+            min: 0, max: 10,
+            grid: { color: '#222', drawBorder: false },
+            ticks: {
+              color: '#a3a3a3',
+              stepSize: 2,
+              font: { family: 'DM Sans' }
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
