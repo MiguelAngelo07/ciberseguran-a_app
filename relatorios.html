@@ -121,6 +121,9 @@
       font-size: 0.82rem;
       color: var(--text-secondary);
       text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .hbar-track {
       background: #1e1e1e;
@@ -142,7 +145,9 @@
       display: grid;
       grid-template-columns: 130px 1fr;
       gap: 10px;
-      margin-top: 6px;
+      margin-top: 16px;
+      border-top: 1px solid #333;
+      padding-top: 8px;
     }
     .hbar-axis-ticks {
       display: flex;
@@ -207,7 +212,6 @@
 <body>
   <main class="page">
 
-    <!-- BACK -->
     <a href="index.html" class="back-link">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -216,7 +220,6 @@
       Voltar ao Dashboard
     </a>
 
-    <!-- HEADER -->
     <div class="rel-header">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -226,272 +229,295 @@
       </svg>
       <div>
         <h1>Relatórios e Análises</h1>
-        <p>Visualize métricas e insights de segurança</p>
+        <p>Visualize métricas e insights de segurança dinâmicos</p>
       </div>
     </div>
 
-    <!-- STAT CARDS -->
     <div class="rs-grid">
-
       <div class="rs-card">
         <div class="rs-top">
           <span>Total de Informações</span>
-          <svg class="green" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
+          <svg class="green" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
           </svg>
         </div>
-        <div class="rs-number">24</div>
-        <div class="rs-sub green">+3 este mês</div>
+        <div class="rs-number" id="stat-total">0</div>
+        <div class="rs-sub green">Base de dados</div>
       </div>
 
       <div class="rs-card">
         <div class="rs-top">
           <span>Risco Médio</span>
-          <svg class="orange" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-            <polyline points="17 6 23 6 23 12"/>
+          <svg class="orange" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
           </svg>
         </div>
-        <div class="rs-number">59%</div>
-        <div class="rs-sub red">Atenção necessária</div>
+        <div class="rs-number" id="stat-risco-medio">0%</div>
+        <div class="rs-sub" id="stat-risco-desc">Aguardando dados</div>
       </div>
 
       <div class="rs-card">
         <div class="rs-top">
           <span>Informações Críticas</span>
-          <svg class="red" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          <svg class="red" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
         </div>
-        <div class="rs-number">5</div>
+        <div class="rs-number" id="stat-criticas">0</div>
         <div class="rs-sub red">Prioridade alta</div>
       </div>
 
       <div class="rs-card">
         <div class="rs-top">
           <span>Conformidade</span>
-          <svg class="lime" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10"/>
-            <line x1="12" y1="20" x2="12" y2="4"/>
-            <line x1="6"  y1="20" x2="6"  y2="14"/>
+          <svg class="lime" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6"  y1="20" x2="6"  y2="14"/>
           </svg>
         </div>
-        <div class="rs-number">92%</div>
-        <div class="rs-sub green">Em conformidade</div>
+        <div class="rs-number" id="stat-conformidade">0%</div>
+        <div class="rs-sub green">Avaliações concluídas</div>
       </div>
+    </div>
 
-    </div><!-- /rs-grid -->
-
-    <!-- CHARTS ROW: Pie + Bar -->
     <div class="charts-row">
-
-      <!-- Pie chart -->
       <div class="chart-card">
         <h3>Classificação de Confidencialidade</h3>
         <div class="pie-wrap">
           <canvas id="pieChart" width="200" height="200"></canvas>
-          <div class="pie-legend">
-            <div class="pie-legend-item">
-              <div class="pie-legend-dot" style="background:#4ade80;"></div>
-              Público: 33%
+          <div class="pie-legend" id="pie-legend-container">
             </div>
-            <div class="pie-legend-item">
-              <div class="pie-legend-dot" style="background:#16a34a;"></div>
-              Interno: 25%
-            </div>
-            <div class="pie-legend-item">
-              <div class="pie-legend-dot" style="background:#14532d;"></div>
-              Confidencial: 29%
-            </div>
-            <div class="pie-legend-item">
-              <div class="pie-legend-dot" style="background:#052e16;"></div>
-              Secreto: 13%
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- Bar chart (vertical) -->
       <div class="chart-card">
         <h3>Níveis de Integridade</h3>
         <canvas id="barChart" height="200"></canvas>
       </div>
+    </div>
 
-    </div><!-- /charts-row -->
-
-    <!-- HORIZONTAL BAR CHART -->
     <div class="chart-full">
-      <h3>Score de Risco por Informação</h3>
+      <h3>Top 5: Maior Score de Risco</h3>
       <div class="hbar-chart">
+        <div id="hbar-rows-container">
+            </div>
 
-        <div class="hbar-row">
-          <div class="hbar-label">Dados Clientes</div>
-          <div class="hbar-track">
-            <div class="hbar-fill" style="width:92%;background:#ef4444;"></div>
-          </div>
-          <div class="hbar-value">92</div>
-        </div>
-
-        <div class="hbar-row">
-          <div class="hbar-label">Rel. Financeiros</div>
-          <div class="hbar-track">
-            <div class="hbar-fill" style="width:74%;background:#f97316;"></div>
-          </div>
-          <div class="hbar-value">74</div>
-        </div>
-
-        <div class="hbar-row">
-          <div class="hbar-label">Doc. Técnica</div>
-          <div class="hbar-track">
-            <div class="hbar-fill" style="width:48%;background:#eab308;"></div>
-          </div>
-          <div class="hbar-value">48</div>
-        </div>
-
-        <div class="hbar-row">
-          <div class="hbar-label">Reg. Funcionários</div>
-          <div class="hbar-track">
-            <div class="hbar-fill" style="width:68%;background:#f97316;"></div>
-          </div>
-          <div class="hbar-value">68</div>
-        </div>
-
-        <div class="hbar-row">
-          <div class="hbar-label">Dados Públicos</div>
-          <div class="hbar-track">
-            <div class="hbar-fill" style="width:24%;background:#4ade80;"></div>
-          </div>
-          <div class="hbar-value">24</div>
-        </div>
-
-        <!-- axis -->
         <div class="hbar-axis">
           <div></div>
           <div class="hbar-axis-ticks">
-            <span>0</span>
-            <span>25</span>
-            <span>50</span>
-            <span>75</span>
-            <span>100</span>
+            <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
           </div>
         </div>
-
       </div>
-    </div><!-- /chart-full -->
+    </div>
 
-    <!-- RECOMMENDATIONS -->
     <div class="recommendations">
-      <h3>Recomendações</h3>
+      <h3>Recomendações e Alertas</h3>
 
       <div class="rec-item danger">
         <div class="rec-title">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           Ação Urgente
         </div>
-        <div class="rec-desc">5 informações com score de risco acima de 70% requerem atenção imediata</div>
+        <div class="rec-desc" id="rec-urgente">Sem ativos críticos detectados no momento.</div>
       </div>
 
       <div class="rec-item warning">
         <div class="rec-title">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-            <polyline points="17 6 23 6 23 12"/>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
           </svg>
-          Revisar Classificações
+          Revisar Cadastros
         </div>
-        <div class="rec-desc">8 informações não foram reclassificadas nos últimos 6 meses</div>
+        <div class="rec-desc" id="rec-revisar">Todas as informações estão classificadas.</div>
       </div>
 
       <div class="rec-item info">
         <div class="rec-title">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10"/>
-            <line x1="12" y1="20" x2="12" y2="4"/>
-            <line x1="6"  y1="20" x2="6"  y2="14"/>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6"  y1="20" x2="6"  y2="14"/>
           </svg>
           Implementar Controles
         </div>
-        <div class="rec-desc">Considere implementar controles adicionais para informações classificadas como "Secreto"</div>
+        <div class="rec-desc" id="rec-controles">Nenhuma informação classificada como "Secreto".</div>
       </div>
 
-    </div><!-- /recommendations -->
+    </div>
 
   </main>
 
-  <script>
-    /* ── Pie Chart ── */
-    const pieCtx = document.getElementById('pieChart').getContext('2d');
-    new Chart(pieCtx, {
-      type: 'pie',
-      data: {
-        labels: ['Público', 'Interno', 'Confidencial', 'Secreto'],
-        datasets: [{
-          data: [33, 25, 29, 13],
-          backgroundColor: ['#4ade80', '#16a34a', '#14532d', '#052e16'],
-          borderColor: '#161616',
-          borderWidth: 2,
-          hoverOffset: 6
-        }]
-      },
-      options: {
-        responsive: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => ` ${ctx.label}: ${ctx.parsed}%`
-            }
-          }
-        }
-      }
-    });
+  <script src="app.js"></script>
 
-    /* ── Vertical Bar Chart ── */
-    const barCtx = document.getElementById('barChart').getContext('2d');
-    new Chart(barCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Baixo', 'Médio', 'Alto', 'Crítico'],
-        datasets: [{
-          data: [5, 8, 7, 4],
-          backgroundColor: '#16a34a',
-          borderRadius: 4,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: {
-            grid: { color: '#222', drawBorder: false },
-            ticks: { color: '#a3a3a3', font: { family: 'DM Sans' } }
-          },
-          y: {
-            min: 0, max: 10,
-            grid: { color: '#222', drawBorder: false },
-            ticks: {
-              color: '#a3a3a3',
-              stepSize: 2,
-              font: { family: 'DM Sans' }
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Busca todos os dados salvos
+        const infos = SC.DB.getAll();
+        const total = infos.length;
+
+        // Variáveis de contagem
+        let scoreSum = 0;
+        let infoComScoreCount = 0;
+        let criticasCount = 0;
+        let conformidadeCount = 0;
+        let secretosCount = 0;
+
+        const confidencialidadeDados = { publico: 0, interno: 0, confidencial: 0, secreto: 0 };
+        const integridadeDados = { baixo: 0, medio: 0, alto: 0, critico: 0 };
+        const rankingRisco = [];
+
+        // 2. Processa os dados
+        infos.forEach(info => {
+            // Conta conformidade (tem os dois questionários preenchidos?)
+            if (info.classificacao && info.avaliacao) conformidadeCount++;
+
+            // Agrupa para o gráfico de Confidencialidade (Pizza)
+            if (info.classificacao && info.classificacao.confidencialidade) {
+                confidencialidadeDados[info.classificacao.confidencialidade]++;
+                if(info.classificacao.confidencialidade === 'secreto') secretosCount++;
             }
-          }
+
+            // Agrupa para o gráfico de Integridade (Barras)
+            if (info.classificacao && info.classificacao.integridade) {
+                integridadeDados[info.classificacao.integridade]++;
+            }
+
+            // Calcula Score e verifica se é crítico
+            const score = SC.calcularScore(info);
+            if (score !== null) {
+                scoreSum += score;
+                infoComScoreCount++;
+                rankingRisco.push({ nome: info.nome, score: score });
+                
+                if (score >= 80) criticasCount++; // Pela regra do seu app.js, >= 80 é Crítico
+            }
+        });
+
+        // 3. Calcula as Médias e Porcentagens
+        const riscoMedio = infoComScoreCount > 0 ? Math.round(scoreSum / infoComScoreCount) : 0;
+        const conformidadePct = total > 0 ? Math.round((conformidadeCount / total) * 100) : 0;
+        const ativosPendentes = total - conformidadeCount;
+
+        // 4. Atualiza os Cards Superiores (DOM)
+        document.getElementById('stat-total').textContent = total;
+        document.getElementById('stat-risco-medio').textContent = `${riscoMedio}%`;
+        document.getElementById('stat-criticas').textContent = criticasCount;
+        document.getElementById('stat-conformidade').textContent = `${conformidadePct}%`;
+
+        // Ajusta cor da descrição do risco médio
+        const riscoMedioDesc = document.getElementById('stat-risco-desc');
+        if (riscoMedio >= 60) {
+            riscoMedioDesc.textContent = "Atenção necessária";
+            riscoMedioDesc.className = "rs-sub red";
+        } else if (riscoMedio > 0) {
+            riscoMedioDesc.textContent = "Risco sob controle";
+            riscoMedioDesc.className = "rs-sub green";
         }
-      }
+
+        // 5. Atualiza Recomendações (DOM)
+        if (criticasCount > 0) {
+            document.getElementById('rec-urgente').textContent = `${criticasCount} informações com score crítico (>= 80) requerem atenção imediata!`;
+        }
+        if (ativosPendentes > 0) {
+            document.getElementById('rec-revisar').textContent = `${ativosPendentes} informações cadastradas ainda não foram classificadas ou avaliadas.`;
+        }
+        if (secretosCount > 0) {
+            document.getElementById('rec-controles').textContent = `Atenção: Existem ${secretosCount} ativos classificados como "Secreto". Certifique-se da criptografia adequada.`;
+        }
+
+        // 6. Atualiza o Gráfico Horizontal (Top 5 Riscos)
+        const hbarContainer = document.getElementById('hbar-rows-container');
+        rankingRisco.sort((a, b) => b.score - a.score); // Ordena do maior pro menor
+        const top5 = rankingRisco.slice(0, 5);
+
+        if (top5.length === 0) {
+            hbarContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Nenhuma informação avaliada ainda.</p>';
+        } else {
+            top5.forEach(item => {
+                const cor = SC.corBarra(item.score); // Usa sua função de cor
+                const rowHTML = `
+                    <div class="hbar-row">
+                        <div class="hbar-label" title="${item.nome}">${item.nome}</div>
+                        <div class="hbar-track">
+                            <div class="hbar-fill" style="width:${item.score}%; background:${cor};"></div>
+                        </div>
+                        <div class="hbar-value">${item.score}</div>
+                    </div>
+                `;
+                hbarContainer.insertAdjacentHTML('beforeend', rowHTML);
+            });
+        }
+
+        // 7. Atualiza Gráfico de Pizza (Confidencialidade)
+        const totalClassificadosConf = Object.values(confidencialidadeDados).reduce((a, b) => a + b, 0);
+        
+        // Função para calcular % da legenda
+        const calcPct = (valor) => totalClassificadosConf > 0 ? Math.round((valor / totalClassificadosConf) * 100) : 0;
+
+        // Renderiza legenda dinamicamente
+        document.getElementById('pie-legend-container').innerHTML = `
+            <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#4ade80;"></div> Público: ${calcPct(confidencialidadeDados.publico)}%</div>
+            <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#16a34a;"></div> Interno: ${calcPct(confidencialidadeDados.interno)}%</div>
+            <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#14532d;"></div> Confidencial: ${calcPct(confidencialidadeDados.confidencial)}%</div>
+            <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#052e16;"></div> Secreto: ${calcPct(confidencialidadeDados.secreto)}%</div>
+        `;
+
+        new Chart(document.getElementById('pieChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: ['Público', 'Interno', 'Confidencial', 'Secreto'],
+                datasets: [{
+                    data: [
+                        confidencialidadeDados.publico, 
+                        confidencialidadeDados.interno, 
+                        confidencialidadeDados.confidencial, 
+                        confidencialidadeDados.secreto
+                    ],
+                    backgroundColor: ['#4ade80', '#16a34a', '#14532d', '#052e16'],
+                    borderColor: '#161616',
+                    borderWidth: 2,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} ativos` } }
+                }
+            }
+        });
+
+        // 8. Atualiza Gráfico de Barras Vertical (Integridade)
+        new Chart(document.getElementById('barChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Baixo', 'Médio', 'Alto', 'Crítico'],
+                datasets: [{
+                    data: [
+                        integridadeDados.baixo, 
+                        integridadeDados.medio, 
+                        integridadeDados.alto, 
+                        integridadeDados.critico
+                    ],
+                    backgroundColor: '#16a34a',
+                    borderRadius: 4,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: '#222', drawBorder: false }, ticks: { color: '#a3a3a3', font: { family: 'DM Sans' } } },
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { stepSize: 1, color: '#a3a3a3', font: { family: 'DM Sans' } },
+                        grid: { color: '#222', drawBorder: false }
+                    }
+                }
+            }
+        });
     });
   </script>
 </body>

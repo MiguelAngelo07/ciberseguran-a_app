@@ -17,7 +17,6 @@
       Voltar ao Dashboard
     </a>
 
-    <!-- FORM -->
     <div class="form-card">
       <div class="section-header">
         <div class="icon-wrap">
@@ -91,7 +90,6 @@
       </button>
     </div>
 
-    <!-- LISTA DE INFORMAÇÕES -->
     <div class="info-list-section">
       <h3 id="lista-titulo">Informações Cadastradas</h3>
       <div id="lista-container"></div>
@@ -137,7 +135,7 @@
                 <th>Formato</th>
                 <th>Proprietário</th>
                 <th>Classificação</th>
-                <th>Score</th>
+                <th>Impacto</th> <th>Score</th>
                 <th>Cadastro</th>
                 <th></th>
               </tr>
@@ -146,7 +144,8 @@
               ${infos.map(info => {
                 const score = SC.calcularScore(info);
                 const nivel = SC.nivelRisco(score);
-                const temCia = !!info.classificacao?.confidencialidade;
+                const temCia = !!info.classificacao; // Verifica se já foi classificada
+                const temImpacto = !!info.avaliacao; // Verifica se já foi avaliada
                 const scoreText = score !== null ? score : '—';
                 const badgeClass = score === null ? 'badge-gray'
                   : score >= 70 ? 'badge-red'
@@ -158,11 +157,23 @@
                   <td>${TIPO_LABELS[info.tipo] || '—'}</td>
                   <td>${FORMATO_LABELS[info.formato] || '—'}</td>
                   <td>${info.proprietario || '—'}</td>
+                  
                   <td>
-                    ${temCia
-                      ? `<span class="badge badge-green">Classificada</span>`
-                      : `<span class="badge badge-gray">Pendente</span>`}
+                    <a href="classificar.html?id=${info.id}" style="text-decoration: none;">
+                      ${temCia
+                        ? `<span class="badge badge-green" style="cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">Classificada</span>`
+                        : `<span class="badge badge-gray" style="cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">Pendente</span>`}
+                    </a>
                   </td>
+
+                  <td>
+                    <a href="avaliar.html?id=${info.id}" style="text-decoration: none;">
+                      ${temImpacto
+                        ? `<span class="badge badge-green" style="cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">Avaliado</span>`
+                        : `<span class="badge badge-gray" style="cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">Pendente</span>`}
+                    </a>
+                  </td>
+
                   <td>
                     <span class="badge ${badgeClass}">${scoreText}${score !== null ? '/100' : ''}</span>
                   </td>
